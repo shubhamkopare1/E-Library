@@ -28,6 +28,11 @@ const issueBookSchema = new Schema(
       required: true, // Ensure the book reference is provided
       index: true, // Index for faster searching
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // Reference to the User model
+      required: true, // Ensure user ID is provided
+    },
     contact: {
       type: Number,
       required: true, // Ensure review is provided

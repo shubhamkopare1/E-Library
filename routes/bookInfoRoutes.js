@@ -13,7 +13,8 @@ const Booking = require("../models/student");
 const router = express.Router();
 
 router.get(
-  "/:id",
+  "/:id", 
+  
   checkAvailability,
   asyncWrap(async (req, res) => {
     const { id } = req.params;
@@ -24,7 +25,9 @@ router.get(
     if (!bookdata) {
       return res.status(404).send("Book not found");
     }
-    const issuedBook = await Booking.findOne({ bookId: bookdata.id });
+    const issuedBook = req.user
+    ? await Booking.findOne({ bookId: bookdata._id, userId: req.user._id })
+    : null;
     res.render("books/info", { bookdata, issuedBook, user: req.user });
   })
 );

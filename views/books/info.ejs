@@ -188,63 +188,47 @@
       <h1><%= bookdata.title[0] %></h1>
       <p><%= bookdata.info %></p>
       <h3>Location: <%= bookdata.location %></h3>
-      <div style="display: flex; gap: 1rem">
-        <div id="days-left"></div>
-        <div id="charges"></div>
-      </div>
-
-      <% if (bookdata.books > 0) { %>
       <div class="btns">
-        <% if (issuedBook) { %> <% if (!issuedBook) { %>
-        <!-- Book is not issued, so show the Issue Book button -->
-        <form action="/books/issue/<%= bookdata._id %>" method="GET">
-          <button class="btn1">Issue Book</button>
-        </form>
-        <% } %> <% } else { %>
-        <form action="/books/issue/<%= bookdata._id %>" method="GET">
-          <button class="btn1">Issue Book</button>
-        </form>
+      <div style="display: flex; gap: 1rem">
+        <% if (issuedBook) { %>
+          <div id="days-left">Days left to return: <%= issuedBook.daysLeft %></div>
+          <div id="charges">Charges: ₹<%= issuedBook.charges %></div>
+        <% } else { %>
+          <form action="/books/issue/<%= bookdata._id %>" method="GET">
+            <button class="btn1">Issue Book</button>
+          </form>
         <% } %>
+      </div>
+     
         <form action="/books">
           <button>Back</button>
         </form>
         <% if (user && user.role === 'admin') { %>
-        <form action="/books/info/edit/<%= bookdata._id %>" method="GET">
-          <button type="submit">Edit Data</button>
-        </form>
+          <form action="/books/info/edit/<%= bookdata._id %>" method="GET">
+            <button type="submit">Edit Data</button>
+          </form>
         <% } %>
       </div>
-      <% } %>
     </div>
   </div>
 </body>
-<script>
-  const dueDate =
-    "<%= issuedBook && issuedBook.dueDate ? issuedBook.dueDate.toISOString() : '' %>";
-
-  if (dueDate) {
+<% if (issuedBook) { %>
+  <script>
+    const dueDate = "<%= issuedBook.dueDate.toISOString() %>";
     const currentDate = new Date();
     const dueDateObj = new Date(dueDate);
     const timeDiff = dueDateObj - currentDate;
     const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
+  
     if (daysLeft >= 0) {
-      // Book is still within the due date
-      document.getElementById(
-        "days-left"
-      ).innerText = `Days left to return: ${daysLeft}`;
+      document.getElementById("days-left").innerText = `Days left to return: ${daysLeft}`;
       document.getElementById("charges").innerText = "Charges: ₹0";
     } else {
-      // Book is overdue
       const overdueDays = Math.abs(daysLeft);
-      const charges = Math.max(0, overdueDays - 7) * 1; // ₹1 per day after 7 overdue days
-      document.getElementById(
-        "days-left"
-      ).innerText = `Overdue by ${overdueDays} days`;
+      const charges = Math.max(0, overdueDays - 7) * 1;
+      document.getElementById("days-left").innerText = `Overdue by ${overdueDays} days`;
       document.getElementById("charges").innerText = `Charges: ₹${charges}`;
     }
-  } else {
-    document.getElementById("days-left").innerText = "";
-    document.getElementById("charges").innerText = "";
-  }
-</script>
+  </script>
+  <% } %>
+  

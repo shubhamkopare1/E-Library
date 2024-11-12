@@ -71,7 +71,7 @@ router.post(
   checkAvailability,
   asyncWrap(async (req, res) => {
     const bookId = req.params.id;
-    const { title, studentId, course, book, contact } = req.body;
+    const { title, studentId, course, book, contact  } = req.body;
     const bookToIssue = await Book.findById(bookId);
     if (bookToIssue.books <= 0) {
       req.flash("error", "This book is not available right now.");
@@ -98,6 +98,7 @@ router.post(
       issueDate: new Date(),
       dueDate: new Date(new Date().setDate(new Date().getDate() + 7)), // 7 days from now
       bookId,
+      userId: req.user._id,
     });
     await newIssue.save();
     req.user.bookings.push(newIssue._id);
